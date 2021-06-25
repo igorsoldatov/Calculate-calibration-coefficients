@@ -28,8 +28,9 @@ def main(name):
     ref_imu = '0'
     gyro_file_names = get_files("magnet", ref_imu)
     data = np.genfromtxt(f'./raw_calib_data/{gyro_file_names[0]}', dtype=float, delimiter=',', skip_header=1)
-    a_inv_ref, b_ref = calibrate_reference_magnetometer(data[:, 8:])
-    ref_data = apply_transformation_to_dataset(data[:, 8:], a_inv_ref, b_ref)
+    scaled_data = scaling_magnetometer_data(data[:, 8:])
+    a_inv_ref, b_ref = calibrate_reference_magnetometer(scaled_data)
+    ref_data = apply_transformation_to_dataset(scaled_data, a_inv_ref, b_ref)
     magnet_ref_calibration_coefficients = {"A": a_inv_ref.tolist(), "b": b_ref.tolist()}
     print(f"Ref IMU: {ref_imu}")
     print("Reference magnetometer calibration coefficients:")
@@ -43,7 +44,8 @@ def main(name):
             gyro_file_names = get_files("magnet", imu)
             data = np.genfromtxt(f'./raw_calib_data/{gyro_file_names[0]}', dtype=float, delimiter=',',
                                  skip_header=1)
-            a, b = calibrate_magnetometer_by_reference(data[:, 8:], ref_data)
+            scaled_imu_data = scaling_magnetometer_data(data[:, 8:])
+            a, b = calibrate_magnetometer_by_reference(scaled_imu_data, ref_data)
             magnet_calibration_coefficients = {"A": a.tolist(), "b": b.tolist()}
             print(f"IMU: {imu}")
             print("Magnetometer calibration coefficients:")

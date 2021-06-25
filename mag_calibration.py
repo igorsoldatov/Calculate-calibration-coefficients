@@ -106,3 +106,17 @@ def transform_data_linear(src, transform_array):
     for i in range(src.shape[0]):
         res[i, :] = np.matmul(src[i, :], transform_array[:, :3]) + transform_array[:, 3]
     return res
+
+
+# scaling
+
+def scaling_magnetometer_data(data):
+    mag_scale_x = ((176 - 128.0) / 256.0 + 1.0) * 4912.0 / 32760.0  # micro Tesla
+    mag_scale_y = ((178 - 128.0) / 256.0 + 1.0) * 4912.0 / 32760.0  # micro Tesla
+    mag_scale_z = ((168 - 128.0) / 256.0 + 1.0) * 4912.0 / 32760.0  # micro Tesla
+    scale_data = np.zeros(data.shape)
+    for i in range(data.shape[0]):
+        scale_data[i, 0] = data[i, 0] * mag_scale_x
+        scale_data[i, 1] = data[i, 1] * mag_scale_y
+        scale_data[i, 2] = data[i, 2] * mag_scale_z
+    return scale_data
